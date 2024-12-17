@@ -1,0 +1,6 @@
+educationsystem.sql中的示例账号为
+管理员账号admin
+教师账号teacher1
+学生账号student1
+密码均为Password123$
+注：密码在数据库中采用SHA256算法存储

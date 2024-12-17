@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Courses to Teachers</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(itemId, actionUrl) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = actionUrl;
+
+                // 添加 course_id 字段
+                const inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = 'course_id';  // 后端接收参数的名字
+                inputId.value = itemId;
+
+                // 添加 action 字段
+                const inputAction = document.createElement('input');
+                inputAction.type = 'hidden';
+                inputAction.name = 'action';  // 后端接收 action 类型的名字
+                inputAction.value = 'delete';
+
+                // 将字段添加到表单中
+                form.appendChild(inputId);
+                form.appendChild(inputAction);
+
+                // 提交表单
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+</script>
+<body>
+    <h2>Manage Courses</h2>
+    <form method="POST">
+        <h3>Add New Course</h3>
+        <label for="course_name">Course Name:</label>
+        <input type="text" id="course_name" name="course_name" required>
+        <label for="course_code">Course Code:</label>
+        <input type="text" id="course_code" name="course_code" required>
+        <label for="credits">Credits:</label>
+        <input type="number" id="credits" name="credits" required>
+        <button type="submit" name="action" value="add">Add Course</button>
+    </form>
+
+    <h3>Existing Courses</h3>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Course Name</th>
+            <th>Course Code</th>
+            <th>Credits</th>
+            <th>Action</th>
+        </tr>
+        {% for course in courses %}
+        <tr>
+            <td>{{ course[0] }}</td>
+            <td>{{ course[1] }}</td>
+            <td>{{ course[2] }}</td>
+            <td>{{ course[3] }}</td>
+            <td>
+                <form method="POST" style="display:inline;">
+                    <input type="hidden" name="course_id" value="{{ course[0] }}">
+                    <button type="button" class="btn btn-danger btn-sm"
+                            onclick="confirmDelete('{{ course[0] }}', '{{ url_for('manage_courses') }}')">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
